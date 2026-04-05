@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NairaTaskHub - Available Tasks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-white font-sans pb-20">
+
+    <nav class="bg-gray-800 p-4 border-b border-gray-700 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center">
+            <a href="dashboard.html" class="text-green-400 mr-4 text-xl"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="text-xl font-bold text-green-400">Available Tasks</h1>
+        </div>
+        <div class="bg-green-900/30 px-3 py-1 rounded-full border border-green-500/50">
+            <span class="text-green-400 font-bold">₦25,400</span>
+        </div>
+    </nav>
+
+    <div class="p-4 flex gap-2 overflow-x-auto whitespace-nowrap no-scrollbar">
+        <button class="bg-green-500 text-gray-900 px-4 py-2 rounded-full font-bold text-sm">All Tasks</button>
+        <button class="bg-gray-800 text-gray-400 px-4 py-2 rounded-full text-sm border border-gray-700">Social Media</button>
+        <button class="bg-gray-800 text-gray-400 px-4 py-2 rounded-full text-sm border border-gray-700">Surveys</button>
+        <button class="bg-gray-800 text-gray-400 px-4 py-2 rounded-full text-sm border border-gray-700">Reviews</button>
+    </div>
+
+    <div class="p-4 space-y-4">
+        
+        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-lg">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="font-bold text-lg">Follow @NairaTaskHub on X</h3>
+                    <p class="text-gray-400 text-xs">Social Media • 2 mins ago</p>
+                </div>
+                <span class="text-green-400 font-black text-xl">+₦100</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-6 leading-relaxed">Follow our official X handle and submit your username for verification.</p>
+            <a href="https://x.com/ObiohaDest41740" target="_blank" class="block w-full bg-blue-500 hover:bg-blue-600 text-white text-center py-3 rounded-xl font-bold transition">
+                Start Task <i class="fas fa-external-link-alt ml-2 text-xs"></i>
+            </a>
+        </div>
+
+        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-lg opacity-90">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="font-bold text-lg">Join Telegram Channel</h3>
+                    <p class="text-gray-400 text-xs">Social Media • 1 hour ago</p>
+                </div>
+                <span class="text-green-400 font-black text-xl">+₦50</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-6 leading-relaxed">Join the official NairaTaskHub community to stay updated on new tasks.</p>
+            <button class="w-full bg-gray-700 text-gray-300 py-3 rounded-xl font-bold border border-gray-600">
+                Join Channel
+            </button>
+        </div>
+
+        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-lg">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="font-bold text-lg">Daily App Check-in</h3>
+                    <p class="text-gray-400 text-xs">Daily Bonus</p>
+                </div>
+                <span class="text-green-400 font-black text-xl">+₦20</span>
+            </div>
+            <button class="w-full bg-green-500 hover:bg-green-600 text-gray-900 py-3 rounded-xl font-bold transition">
+                Claim Reward
+            </button>
+        </div>
+
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-3 flex justify-around items-center md:hidden">
+        <a href="dashboard.html" class="text-gray-500 flex flex-col items-center text-[10px]">
+            <i class="fas fa-home text-lg"></i> Overview
+        </a>
+        <a href="tasks.html" class="text-green-400 flex flex-col items-center text-[10px]">
+            <i class="fas fa-tasks text-lg"></i> My Tasks
+        </a>
+        <a href="#" class="text-gray-500 flex flex-col items-center text-[10px]">
+            <i class="fas fa-wallet text-lg"></i> Wallet
+        </a>
+    </div>
+
+</body>
+</html>

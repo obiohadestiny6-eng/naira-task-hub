@@ -48,6 +48,10 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
@@ -60,24 +64,31 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
 
         async function requestMoney() {
-            const user = auth.currentUser;
-            if(!user) return window.location.href = "index.html";
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert("Please log in again.");
+                window.location.href = "index.html";
+                return;
+            }
 
             const bank = document.getElementById('bankName').value;
             const holder = document.getElementById('accHolder').value;
             const acc = document.getElementById('accNum').value;
             const amt = document.getElementById('amount').value;
 
-            if(!bank || !holder || !acc || !amt) return alert("Please complete all details");
+            if(!bank || !holder || !acc || !amt) {
+                alert("All fields are required!");
+                return;
+            }
 
             const btn = document.getElementById('payBtn');
             btn.innerText = "Processing...";
             btn.disabled = true;
 
             try {
+                // WAIT for the database to save before moving
                 await db.collection('withdrawals').add({
                     email: user.email,
                     bank: bank,
@@ -87,8 +98,12 @@
                     status: 'pending',
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert("Success! Check your history for updates.");
-                window.location.href = "dashboard.html";
+                
+                alert("Withdrawal Request Sent! ✅");
+                
+                // Use replace to avoid the logout glitch
+                window.location.replace("payouts.html");
+
             } catch (e) {
                 alert("Error: " + e.message);
                 btn.innerText = "Send Request";

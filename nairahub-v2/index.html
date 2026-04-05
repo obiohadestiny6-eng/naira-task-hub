@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NairaTaskHub | Premium Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafbfc; }
+        .btn-gradient { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); transition: transform 0.2s; }
+        .btn-gradient:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6">
+    <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg border border-gray-100">
+        <div class="text-center mb-10">
+            <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4">
+                <span class="text-white text-3xl font-bold">₦</span>
+            </div>
+            <h1 class="text-4xl font-extrabold text-gray-950 tracking-tight">Naira<span class="text-green-500">Task</span>Hub</h1>
+            <p class="text-gray-500 mt-2">Log in to your premium earning suite.</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <input type="email" id="email" placeholder="Email Address" required class="w-full px-5 py-4 border border-gray-200 rounded-xl outline-none focus:border-green-500">
+            <input type="password" id="password" placeholder="Password" required class="w-full px-5 py-4 border border-gray-200 rounded-xl outline-none focus:border-green-500">
+            <button type="submit" class="w-full btn-gradient text-white py-4 rounded-2xl text-lg font-bold">Log In</button>
+        </form>
+
+        <p class="mt-8 text-center text-gray-600 font-medium">New member? <a href="signup.html" class="text-green-600 font-bold underline ml-1">Create Account</a></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPjBdsaGPxgdrb4pTxyQwYbqJ4xJ_RCVQ",
+            authDomain: "nairataskhub-v2.firebaseapp.com",
+            projectId: "nairataskhub-v2",
+            storageBucket: "nairataskhub-v2.firebasestorage.app",
+            messagingSenderId: "817684965148",
+            appId: "1:817684965148:web:0e3439fd6072b955a77cd9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            signInWithEmailAndPassword(auth, email.value, password.value)
+                .then(() => { window.location.href = "dashboard.html"; })
+                .catch((error) => { alert("Error: " + error.message); });
+        });
+    </script>
+</body>
+</html>

@@ -24,9 +24,48 @@
             <a href="dashboard.html" class="block text-center text-green-600 font-medium">Back to Home</a>
         </div>
     </div>
-
+<div class="mt-10">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Your Payout History</h2>
+            <div id="historyList" class="space-y-3">
+                <p class="text-center text-gray-400 text-sm">Loading history...</p>
+            </div>
+        </div>
     <script>
-        // Use the same Firebase config you have in your index.html
+        // This code watches your Firebase database for changes
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                const db = firebase.firestore();
+                db.collection('withdrawals')
+                  .where('email', '==', user.email)
+                  .onSnapshot(snapshot => {
+                      const historyList = document.getElementById('historyList');
+                      historyList.innerHTML = ""; // Clear the loading text
+
+                      if (snapshot.empty) {
+                          historyList.innerHTML = "<p class='text-center text-gray-400 text-sm'>No history yet.</p>";
+                          return;
+                      }
+
+                      snapshot.forEach(doc => {
+                          const data = doc.data();
+                          // If you change 'pending' to 'approved' in Firebase, this color changes!
+                          const statusColor = data.status === 'approved' ? 'text-green-600' : 'text-orange-500';
+                          
+                          historyList.innerHTML += `
+                              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center mb-2">
+                                  <div>
+                                      <p class="font-bold text-gray-800">₦${data.amount}</p>
+                                      <p class="text-xs text-gray-400">${data.bank}</p>
+                                  </div>
+                                  <div class="text-right">
+                                      <p class="text-sm font-bold ${statusColor}">${data.status.toUpperCase()}</p>
+                                  </div>
+                              </div>
+                          `;
+                      });
+                  });
+            }
+        });// Use the same Firebase config you have in your index.html
         const firebaseConfig = {
   apiKey: "AIzaSyAPjBdsaGPxgdrb4pTxyQwYbqJ4xJ_RCVQ",
   authDomain: "nairataskhub-v2.firebaseapp.com",

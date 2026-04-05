@@ -13,33 +13,86 @@
         .premium-card { background: white; border-radius: 24px; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
     </style>
 </head>
-<body class="flex items-center justify-center p-6">
-    <div class="premium-card w-full max-w-md p-8">
-        <h1 class="text-2xl font-bold text-green-700 text-center mb-6">Withdraw Funds</h1>
-        <div class="space-y-4">
-            <input type="text" id="bankName" placeholder="Bank Name (e.g. Kuda, Opay)" class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-green-500">
-            <input type="number" id="accNum" placeholder="Account Number" class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-green-500">
-            <input type="number" id="amount" placeholder="Amount to Withdraw" class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-green-500">
-            <button onclick="requestMoney()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition">Request Payout</button>
-            <a href="dashboard.html" class="block text-center text-green-600 font-medium">Back to Home</a>
+<body class="p-6">
+    <div class="max-w-md mx-auto">
+        <div class="premium-card p-8 mb-8">
+            <h1 class="text-2xl font-bold text-green-700 text-center mb-6">Withdraw Funds</h1>
+            <div class="space-y-4">
+                <input type="text" id="bankName" placeholder="Bank Name (e.g. Kuda, Opay)" class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-green-500">
+                
+                <input type="text" id="accHolder" placeholder="Account Holder Name" class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-green-500">
+                
+                <input type="number" id="accNum" placeholder="Account Number" class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-green-500">
+                <input type="number" id="amount" placeholder="Amount to Withdraw" class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-green-500">
+                
+                <button onclick="requestMoney()" id="payBtn" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition">
+                    Request Payout
+                </button>
+                <a href="dashboard.html" class="block text-center text-green-600 font-medium">Back to Home</a>
+            </div>
         </div>
-    </div>
-<div class="mt-10">
+
+        <div class="mt-10">
             <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Your Payout History</h2>
             <div id="historyList" class="space-y-3">
                 <p class="text-center text-gray-400 text-sm">Loading history...</p>
             </div>
         </div>
+    </div>
+
     <script>
-        // This code watches your Firebase database for changes
-        firebase.auth().onAuthStateChanged(user => {
+        // YOUR FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
+            authDomain: "nairataskhub-v2.firebaseapp.com",
+            projectId: "nairataskhub-v2",
+            storageBucket: "nairataskhub-v2.firebasestorage.app",
+            messagingSenderId: "817684965148",
+            appId: "1:817684965148:web:0e3439fd6072b955a77cd9",
+            measurementId: "G-YXFR5937ZV"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        async function requestMoney() {
+            const user = auth.currentUser;
+            if(!user) return alert("Please log in first!");
+
+            const bank = document.getElementById('bankName').value;
+            const holder = document.getElementById('accHolder').value;
+            const acc = document.getElementById('accNum').value;
+            const amt = document.getElementById('amount').value;
+
+            if(!bank || !holder || !acc || !amt) return alert("Please fill all fields");
+
+            document.getElementById('payBtn').innerText = "Processing...";
+
+            try {
+                await db.collection('withdrawals').add({
+                    email: user.email,
+                    bank: bank,
+                    accountHolder: holder,
+                    accountNumber: acc,
+                    amount: amt,
+                    status: 'pending',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("Withdrawal Request Sent!");
+                document.getElementById('payBtn').innerText = "Request Payout";
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        }
+
+        // AUTO-LOAD HISTORY SCRIPT
+        auth.onAuthStateChanged(user => {
             if (user) {
-                const db = firebase.firestore();
                 db.collection('withdrawals')
                   .where('email', '==', user.email)
                   .onSnapshot(snapshot => {
                       const historyList = document.getElementById('historyList');
-                      historyList.innerHTML = ""; // Clear the loading text
+                      historyList.innerHTML = ""; 
 
                       if (snapshot.empty) {
                           historyList.innerHTML = "<p class='text-center text-gray-400 text-sm'>No history yet.</p>";
@@ -48,54 +101,23 @@
 
                       snapshot.forEach(doc => {
                           const data = doc.data();
-                          // If you change 'pending' to 'approved' in Firebase, this color changes!
                           const statusColor = data.status === 'approved' ? 'text-green-600' : 'text-orange-500';
                           
                           historyList.innerHTML += `
-                              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center mb-2">
+                              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center mb-3">
                                   <div>
-                                      <p class="font-bold text-gray-800">₦${data.amount}</p>
-                                      <p class="text-xs text-gray-400">${data.bank}</p>
+                                      <p class="font-bold text-gray-800 text-lg">₦${data.amount}</p>
+                                      <p class="text-xs text-gray-500">${data.bank} - ${data.accountNumber}</p>
                                   </div>
                                   <div class="text-right">
-                                      <p class="text-sm font-bold ${statusColor}">${data.status.toUpperCase()}</p>
+                                      <p class="text-xs font-bold uppercase tracking-wider ${statusColor}">${data.status}</p>
                                   </div>
                               </div>
                           `;
                       });
                   });
             }
-        });// Use the same Firebase config you have in your index.html
-        const firebaseConfig = {
-  apiKey: "AIzaSyAPjBdsaGPxgdrb4pTxyQwYbqJ4xJ_RCVQ",
-  authDomain: "nairataskhub-v2.firebaseapp.com",
-  projectId: "nairataskhub-v2",
-  storageBucket: "nairataskhub-v2.firebasestorage.app",
-  messagingSenderId: "817684965148",
-  appId: "1:817684965148:web:0e3439fd6072b955a77cd9",
-  measurementId: "G-YXFR5937ZV"
-};
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        async function requestMoney() {
-            const user = firebase.auth().currentUser;
-            const bank = document.getElementById('bankName').value;
-            const acc = document.getElementById('accNum').value;
-            const amt = document.getElementById('amount').value;
-
-            if(!bank || !acc || !amt) return alert("Please fill all fields");
-
-            await db.collection('withdrawals').add({
-                email: user.email,
-                bank: bank,
-                account: acc,
-                amount: amt,
-                status: 'pending'
-            });
-            alert("Request sent! Destiny will process your payment soon.");
-            window.location.href = "dashboard.html";
-        }
+        });
     </script>
 </body>
 </html>

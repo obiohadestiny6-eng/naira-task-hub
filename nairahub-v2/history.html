@@ -3,21 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction History | NairaTaskHub</title>
+    <title>History | NairaTaskHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <style>
+        /* This hides the page content until we are sure you are logged in */
+        #mainContent { display: none; }
+        #loader { display: flex; height: 100vh; align-items: center; justify-content: center; font-family: sans-serif; }
+    </style>
 </head>
-<body class="bg-gray-50 p-6">
-    <div class="max-w-md mx-auto">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">History 📜</h1>
-            <a href="dashboard.html" class="text-green-600 font-bold text-sm">Back</a>
-        </div>
+<body class="bg-gray-50">
 
-        <div id="historyList" class="space-y-4">
+    <div id="loader">
+        <div class="text-center">
+            <div class="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-gray-400 text-sm font-bold animate-pulse">Verifying Session...</p>
+        </div>
     </div>
+
+    <div id="mainContent" class="p-6">
+        <div class="max-w-md mx-auto">
+            <div class="flex items-center justify-between mb-8">
+                <h1 class="text-2xl font-black text-gray-800 tracking-tight">Payout History</h1>
+                <a href="dashboard.html" class="bg-white px-4 py-2 rounded-xl text-xs font-bold text-gray-500 border border-gray-200">Close</a>
+            </div>
+
+            <div id="historyList" class="space-y-4">
+                </div>
+        </div>
     </div>
 
     <script>
@@ -33,9 +48,16 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        firebase.firebase.auth().onAuthStateChanged(user => {
+        // THE FIXED LOGIC
+        firebase.auth().onAuthStateChanged(user => {
+            const loader = document.getElementById('loader');
+            const content = document.getElementById('mainContent');
+
             if (user) {
-                // USER IS FOUND - Load the history
+                // USER FOUND - Show the page and hide the loader
+                loader.style.display = 'none';
+                content.style.display = 'block';
+
                 db.collection('withdrawals')
                   .where('email', '==', user.email)
                   .orderBy('timestamp', 'desc')
@@ -44,75 +66,34 @@
                       list.innerHTML = ""; 
 
                       if (snapshot.empty) {
-                          list.innerHTML = "<div class='text-center py-10 text-gray-400'>No history found yet.</div>";
+                          list.innerHTML = "<div class='text-center py-20 text-gray-400 text-sm'>No payout history yet.</div>";
                           return;
                       }
 
                       snapshot.forEach(doc => {
                           const data = doc.data();
-                          const color = data.status === 'approved' ? 'text-green-600 bg-green-50' : 'text-orange-600 bg-orange-50';
+                          const isApproved = data.status === 'approved';
+                          const colorClass = isApproved ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700';
+                          
                           list.innerHTML += `
-                              <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center mb-3">
+                              <div class="bg-white p-5 rounded-3xl border border-gray-100 flex justify-between items-center shadow-sm mb-2">
                                   <div>
-                                      <p class="text-lg font-black text-gray-800">₦${data.amount}</p>
-                                      <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">${data.bank}</p>
+                                      <p class="text-xl font-black text-gray-800">₦${data.amount}</p>
+                                      <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">${data.bank}</p>
                                   </div>
-                                  <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${color}">${data.status}</span>
+                                  <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase ${colorClass}">
+                                      ${data.status}
+                                  </span>
                               </div>`;
                       });
-                  }, error => {
-                      // If there is a Firebase error (like missing Index), show it here
-                      console.log("Error:", error.message);
-                      document.getElementById('historyList').innerHTML = "<p class='text-center text-red-400'>Please wait for database to sync...</p>";
                   });
             } else {
-                // ONLY log out if the user is definitely NOT logged in
-                // We wait 2 seconds before redirecting to be safe
+                // NO USER - Wait 3 seconds to be 100% sure before kicking them out
                 setTimeout(() => {
                     if (!firebase.auth().currentUser) {
                         window.location.href = "index.html";
                     }
-                }, 2000);
-            }
-        });(user => {
-            if (user) {
-                // This is the "Snapshot" - it watches for real-time changes
-                db.collection('withdrawals')
-                  .where('email', '==', user.email)
-                  .orderBy('timestamp', 'desc') // Shows newest at the top
-                  .onSnapshot(snapshot => {
-                      const list = document.getElementById('historyList');
-                      
-                      // This removes the "Loading..." text as soon as data arrives
-                      list.innerHTML = ""; 
-
-                      if (snapshot.empty) {
-                          list.innerHTML = "<div class='text-center py-10 text-gray-400'>No history found.</div>";
-                          return;
-                      }
-
-                      snapshot.forEach(doc => {
-                          const data = doc.data();
-                          // Set colors: Green for approved, Orange for pending
-                          const color = data.status === 'approved' ? 'text-green-600 bg-green-50' : 'text-orange-600 bg-orange-50';
-                          
-                          list.innerHTML += `
-                              <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center mb-3">
-                                  <div>
-                                      <p class="text-lg font-black text-gray-800">₦${data.amount}</p>
-                                      <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">${data.bank}</p>
-                                  </div>
-                                  <div class="text-right">
-                                      <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${color}">
-                                          ${data.status}
-                                      </span>
-                                  </div>
-                              </div>`;
-                      });
-                  });
-            } else {
-                // If not logged in, send them back to login
-                window.location.href = "index.html";
+                }, 3000);
             }
         });
     </script>

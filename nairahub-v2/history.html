@@ -12,6 +12,7 @@
         body { background-color: #f9fafb; font-family: sans-serif; }
         .tab-active { border-bottom: 3px solid #16a34a; color: #16a34a; font-weight: 800; }
         .history-card { background: white; border-radius: 20px; border: 1px solid #f1f5f9; }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="p-6">
@@ -27,13 +28,17 @@
             <button id="btnApproved" onclick="switchTab('approved')" class="flex-1 py-3 text-sm text-gray-400 font-bold">Approved</button>
         </div>
 
-        <div id="loader" class="py-20 text-center">
-            <div class="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-            <p class="text-gray-400 text-[10px] font-bold uppercase">Syncing...</p>
+        <div id="authError" class="hidden py-20 text-center">
+            <p class="text-gray-400 text-sm mb-4">Please log in to view history</p>
+            <a href="index.html" class="bg-green-600 text-white px-6 py-2 rounded-full font-bold text-xs uppercase">Go to Login</a>
         </div>
 
-        <div id="historyList" class="hidden space-y-3">
-            </div>
+        <div id="loader" class="py-20 text-center">
+            <div class="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p class="text-gray-400 text-[10px] font-bold uppercase">Syncing Database...</p>
+        </div>
+
+        <div id="historyList" class="hidden space-y-3"></div>
     </div>
 
     <script>
@@ -53,12 +58,14 @@
         let currentTab = 'pending';
         let allData = [];
 
-        // WAIT FOR USER SESSION
+        // FIXED AUTH: Removed the "window.location" redirect
         auth.onAuthStateChanged(user => {
             if (user) {
                 fetchData(user.email);
             } else {
-                setTimeout(() => { if(!auth.currentUser) window.location.href='index.html'; }, 5000);
+                // If no user, show a button instead of kicking them out
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('authError').classList.remove('hidden');
             }
         });
 
@@ -71,12 +78,13 @@
                     renderList();
                     document.getElementById('loader').style.display = 'none';
                     document.getElementById('historyList').classList.remove('hidden');
+                }, error => {
+                    console.error("Firestore Error:", error);
                 });
         }
 
         function switchTab(status) {
             currentTab = status;
-            // Update UI Colors
             document.getElementById('btnPending').classList.toggle('tab-active', status === 'pending');
             document.getElementById('btnApproved').classList.toggle('tab-active', status === 'approved');
             renderList();
@@ -95,7 +103,7 @@
             filtered.forEach(data => {
                 const badgeColor = data.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700';
                 list.innerHTML += `
-                    <div class="history-card p-5 flex justify-between items-center animate-fade-in">
+                    <div class="history-card p-5 flex justify-between items-center">
                         <div>
                             <p class="text-xl font-black text-gray-800">₦${data.amount}</p>
                             <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">${data.bank}</p>

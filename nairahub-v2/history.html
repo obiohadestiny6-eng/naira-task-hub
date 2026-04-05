@@ -35,30 +35,42 @@
 
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
+                // This is the "Snapshot" - it watches for real-time changes
                 db.collection('withdrawals')
                   .where('email', '==', user.email)
-                  .orderBy('timestamp', 'desc')
+                  .orderBy('timestamp', 'desc') // Shows newest at the top
                   .onSnapshot(snapshot => {
                       const list = document.getElementById('historyList');
+                      
+                      // This removes the "Loading..." text as soon as data arrives
                       list.innerHTML = ""; 
+
                       if (snapshot.empty) {
                           list.innerHTML = "<div class='text-center py-10 text-gray-400'>No history found.</div>";
                           return;
                       }
+
                       snapshot.forEach(doc => {
                           const data = doc.data();
+                          // Set colors: Green for approved, Orange for pending
                           const color = data.status === 'approved' ? 'text-green-600 bg-green-50' : 'text-orange-600 bg-orange-50';
+                          
                           list.innerHTML += `
-                              <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+                              <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center mb-3">
                                   <div>
                                       <p class="text-lg font-black text-gray-800">₦${data.amount}</p>
-                                      <p class="text-[10px] text-gray-400 uppercase font-bold">${data.bank}</p>
+                                      <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">${data.bank}</p>
                                   </div>
-                                  <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase ${color}">${data.status}</span>
+                                  <div class="text-right">
+                                      <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${color}">
+                                          ${data.status}
+                                      </span>
+                                  </div>
                               </div>`;
                       });
                   });
             } else {
+                // If not logged in, send them back to login
                 window.location.href = "index.html";
             }
         });

@@ -12,8 +12,8 @@
 
     <div class="w-full max-w-md bg-white p-10 rounded-[40px] shadow-xl">
         <div class="text-center mb-10">
-            <h1 class="text-3xl font-black text-gray-900">Naira<span class="text-green-500">Task</span></h1>
-            <p class="text-gray-400 text-sm font-semibold mt-2 uppercase tracking-widest">Premium Earning Portal</p>
+            <h1 class="text-3xl font-black text-gray-900 leading-tight">Naira<span class="text-green-500">Task</span>Hub</h1>
+            <p class="text-gray-400 text-sm font-semibold mt-2 uppercase tracking-widest">Premium Portal</p>
         </div>
 
         <form id="loginForm" class="space-y-5">
@@ -23,14 +23,10 @@
                 class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition">
             
             <button type="submit" id="loginBtn" 
-                class="w-full bg-green-600 text-white py-4 rounded-2xl font-extrabold text-lg shadow-lg shadow-green-100 active:scale-95 transition">
-                Sign In ➔
+                class="w-full bg-green-600 text-white py-4 rounded-2xl font-extrabold text-lg shadow-lg active:scale-95 transition">
+                Log In ➔
             </button>
         </form>
-
-        <p class="text-center mt-8 text-gray-500 font-medium text-sm">
-            New member? <a href="signup.html" class="text-green-600 font-bold hover:underline">Create Account</a>
-        </p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -53,20 +49,20 @@
             const pass = document.getElementById('password').value;
             const btn = document.getElementById('loginBtn');
 
-            btn.innerText = "Verifying...";
+            btn.innerText = "Signing in...";
             btn.disabled = true;
 
-            // FORCE BROWSER TO REMEMBER LOGIN
+            // This line ensures your phone "remembers" you
             firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                 .then(() => {
                     return firebase.auth().signInWithEmailAndPassword(email, pass);
                 })
                 .then(() => {
-                    window.location.href = "dashboard.html";
+                    window.location.replace("dashboard.html");
                 })
                 .catch((error) => {
-                    alert("Error: " + error.message);
-                    btn.innerText = "Sign In ➔";
+                    alert("Login Error: " + error.message);
+                    btn.innerText = "Log In ➔";
                     btn.disabled = false;
                 });
         });

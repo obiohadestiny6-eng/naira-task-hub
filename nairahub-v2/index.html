@@ -3,66 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NairaTaskHub | Premium Login</title>
+    <title>Login | NairaTaskHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafbfc; }
-        .btn-gradient { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); transition: transform 0.2s; }
-        .btn-gradient:active { transform: scale(0.98); }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-6">
-    <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg border border-gray-100">
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
+
+    <div class="w-full max-w-md bg-white p-10 rounded-[40px] shadow-xl">
         <div class="text-center mb-10">
-            <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4">
-                <span class="text-white text-3xl font-bold">₦</span>
-            </div>
-            <h1 class="text-4xl font-extrabold text-gray-950 tracking-tight">Naira<span class="text-green-500">Task</span>Hub</h1>
-            <p class="text-gray-500 mt-2">Log in to your premium earning site.</p>
+            <h1 class="text-3xl font-black text-gray-900">Naira<span class="text-green-500">Task</span></h1>
+            <p class="text-gray-400 text-sm font-semibold mt-2 uppercase tracking-widest">Premium Earning Portal</p>
         </div>
 
-        <form id="loginForm" class="space-y-6">
-            <input type="email" id="email" placeholder="Email Address" required class="w-full px-5 py-4 border border-gray-200 rounded-xl outline-none focus:border-green-500">
-            <input type="password" id="password" placeholder="Password" required class="w-full px-5 py-4 border border-gray-200 rounded-xl outline-none focus:border-green-500">
-            <button type="submit" class="w-full btn-gradient text-white py-4 rounded-2xl text-lg font-bold">Log In</button>
+        <form id="loginForm" class="space-y-5">
+            <input type="email" id="email" placeholder="Email Address" required 
+                class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition">
+            <input type="password" id="password" placeholder="Password" required 
+                class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition">
+            
+            <button type="submit" id="loginBtn" 
+                class="w-full bg-green-600 text-white py-4 rounded-2xl font-extrabold text-lg shadow-lg shadow-green-100 active:scale-95 transition">
+                Sign In ➔
+            </button>
         </form>
 
-        <p class="mt-8 text-center text-gray-600 font-medium">New member? <a href="signup.html" class="text-green-600 font-bold underline ml-1">Create Account</a></p>
+        <p class="text-center mt-8 text-gray-500 font-medium text-sm">
+            New member? <a href="signup.html" class="text-green-600 font-bold hover:underline">Create Account</a>
+        </p>
     </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
-        authDomain: "nairataskhub-v2.firebaseapp.com",
-        projectId: "nairataskhub-v2",
-        storageBucket: "nairataskhub-v2.firebasestorage.app",
-        messagingSenderId: "817684965148",
-        appId: "1:817684965148:web:0e3439fd6072b955a77cd9"
-    };
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
+            authDomain: "nairataskhub-v2.firebaseapp.com",
+            projectId: "nairataskhub-v2",
+            storageBucket: "nairataskhub-v2.firebasestorage.app",
+            messagingSenderId: "817684965148",
+            appId: "1:817684965148:web:0e3439fd6072b955a77cd9"
+        };
+        firebase.initializeApp(firebaseConfig);
 
-    firebase.initializeApp(firebaseConfig);
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
 
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
+            btn.innerText = "Verifying...";
+            btn.disabled = true;
 
-        // Force the browser to remember you
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-            .then(() => {
-                return firebase.auth().signInWithEmailAndPassword(email, pass);
-            })
-            .then(() => {
-                window.location.href = "dashboard.html";
-            })
-            .catch((error) => {
-                alert("Error: " + error.message);
-            });
-    });
-</script>
+            // FORCE BROWSER TO REMEMBER LOGIN
+            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                .then(() => {
+                    return firebase.auth().signInWithEmailAndPassword(email, pass);
+                })
+                .then(() => {
+                    window.location.href = "dashboard.html";
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                    btn.innerText = "Sign In ➔";
+                    btn.disabled = false;
+                });
+        });
+    </script>
 </body>
 </html>

@@ -55,7 +55,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-    <script>
+   <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
             authDomain: "nairataskhub-v2.firebaseapp.com",
@@ -68,23 +68,35 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Logout Function
+        // 🚪 MANUAL LOGOUT ONLY
         function logoutUser() {
-            firebase.auth().signOut().then(() => {
-                window.location.href = "index.html";
-            });
+            if(confirm("Are you sure you want to logout?")) {
+                firebase.auth().signOut().then(() => {
+                    window.location.replace("index.html");
+                });
+            }
         }
 
+        // 🛡️ PROTECT DASHBOARD
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
+                console.log("User is logged in:", user.email);
                 document.getElementById('userName').innerText = user.displayName || "User";
+                
+                // Get Balance
                 db.collection('users').doc(user.uid).onSnapshot((doc) => {
                     if (doc.exists) {
-                        document.getElementById('balance').innerText = doc.data().balance.toFixed(2);
+                        const bal = doc.data().balance || 0;
+                        document.getElementById('balance').innerText = bal.toLocaleString();
                     }
+                }, (error) => {
+                    console.log("Snapshot error:", error);
                 });
+
             } else {
-                window.location.href = "index.html";
+                // Only redirect if there is NO user session at all
+                console.log("No session found, redirecting...");
+                window.location.replace("index.html");
             }
         });
     </script>

@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | NairaTask</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        .btn-task { background: white; border: 1px solid #e2e8f0; border-radius: 20px; transition: all 0.2s; }
+        .btn-task:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="pb-24">
 
+    <div class="bg-white px-6 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-50">
+        <div>
+            <h1 class="text-xl font-black text-gray-900 leading-tight">Naira<span class="text-green-500">Task</span></h1>
+            <p id="userName" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Loading Profile...</p>
+        </div>
+        
+        <button onclick="logoutUser()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-red-100 shadow-sm active:scale-95 transition">
+            Logout 🚪
+        </button>
+    </div>
+
+    <div class="p-6">
+        <div class="bg-gradient-to-br from-green-500 to-green-700 p-8 rounded-[35px] text-white shadow-2xl shadow-green-200 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+            
+            <p class="text-green-100 text-xs font-semibold uppercase tracking-wider">Available Balance</p>
+            <h2 class="text-5xl font-black mt-3 tracking-tighter">₦<span id="balance">0.00</span></h2>
+            
+            <button onclick="window.location.href='withdraw.html'" class="mt-8 w-full bg-white text-green-700 font-extrabold py-4 rounded-2xl shadow-lg active:scale-95 transition flex justify-center items-center gap-2">
+                Withdraw Funds 💰
+            </button>
+        </div>
+
+        <button onclick="window.location.href='payouts.html'" class="w-full mt-4 bg-white border border-gray-100 text-gray-500 font-bold py-4 rounded-2xl flex justify-between items-center px-6 shadow-sm active:scale-95 transition">
+            <span class="text-[11px] uppercase tracking-widest">View Payout History</span>
+            <span class="text-green-500 text-lg font-black">➔</span>
+        </button>
+    </div>
+
+    <div class="px-6 space-y-4">
+        <div class="flex justify-between items-center px-1">
+            <h3 class="text-lg font-bold text-gray-900">Available Tasks</h3>
+            <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-md uppercase">New</span>
+        </div>
+
+        <div class="btn-task p-5 flex justify-between items-center shadow-sm">
+            <div>
+                <p class="font-bold text-gray-900 text-sm">Follow on TikTok</p>
+                <p class="text-[11px] text-green-600 font-bold mt-0.5">+ ₦50.00 Reward</p>
+            </div>
+            <button class="bg-gray-900 text-white px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-tight">Start</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
+            authDomain: "nairataskhub-v2.firebaseapp.com",
+            projectId: "nairataskhub-v2",
+            storageBucket: "nairataskhub-v2.firebasestorage.app",
+            messagingSenderId: "817684965148",
+            appId: "1:817684965148:web:0e3439fd6072b955a77cd9",
+            measurementId: "G-YXFR5937ZV"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Manual Logout Function
+        function logoutUser() {
+            if(confirm("Are you sure you want to log out?")) {
+                firebase.auth().signOut().then(() => {
+                    window.location.replace("index.html");
+                });
+            }
+        }
+
+        // Persistent Session Management
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // User is here! Update the UI
+                document.getElementById('userName').innerText = user.displayName || user.email.split('@')[0];
+                
+                // Get Balance from Firestore
+                db.collection('users').doc(user.uid).onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const amount = doc.data().balance || 0;
+                        document.getElementById('balance').innerText = amount.toLocaleString(undefined, {minimumFractionDigits: 2});
+                    }
+                });
+            } else {
+                // No user found. Wait 3 seconds to be sure (stops mobile ghost-logouts)
+                setTimeout(() => {
+                    if (!firebase.auth().currentUser) {
+                        window.location.replace("index.html");
+                    }
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

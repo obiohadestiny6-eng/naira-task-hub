@@ -63,49 +63,40 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
-            authDomain: "nairataskhub-v2.firebaseapp.com",
-            projectId: "nairataskhub-v2",
-            storageBucket: "nairataskhub-v2.firebasestorage.app",
-            messagingSenderId: "817684965148",
-            appId: "1:817684965148:web:0e3439fd6072b955a77cd9",
-            measurementId: "G-YXFR5937ZV"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    const firebaseConfig = {
+        apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
+        authDomain: "nairataskhub-v2.firebaseapp.com",
+        projectId: "nairataskhub-v2",
+        storageBucket: "nairataskhub-v2.firebasestorage.app",
+        messagingSenderId: "817684965148",
+        appId: "1:817684965148:web:0e3439fd6072b955a77cd9"
+    };
 
-        // Manual Logout Function
-        function logoutUser() {
-            if(confirm("Are you sure you want to log out?")) {
-                firebase.auth().signOut().then(() => {
-                    window.location.replace("index.html");
-                });
-            }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function logoutUser() {
+        if(confirm("Logout?")) {
+            firebase.auth().signOut().then(() => {
+                window.location.replace("index.html");
+            });
         }
+    }
 
-        // Persistent Session Management
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                // User is here! Update the UI
-                document.getElementById('userName').innerText = user.displayName || user.email.split('@')[0];
-                
-                // Get Balance from Firestore
-                db.collection('users').doc(user.uid).onSnapshot((doc) => {
-                    if (doc.exists) {
-                        const amount = doc.data().balance || 0;
-                        document.getElementById('balance').innerText = amount.toLocaleString(undefined, {minimumFractionDigits: 2});
-                    }
-                });
-            } else {
-                // No user found. Wait 3 seconds to be sure (stops mobile ghost-logouts)
-                setTimeout(() => {
-                    if (!firebase.auth().currentUser) {
-                        window.location.replace("index.html");
-                    }
-                }, 3000);
-            }
-        });
-    </script>
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById('userName').innerText = user.displayName || "Member";
+            db.collection('users').doc(user.uid).onSnapshot((doc) => {
+                if (doc.exists) {
+                    const amount = doc.data().balance || 0;
+                    document.getElementById('balance').innerText = amount.toLocaleString();
+                }
+            });
+        } else {
+            // No redirect here - we wait for the session to load!
+            console.log("Waiting for Firebase...");
+        }
+    });
+</script>
 </body>
 </html>

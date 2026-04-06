@@ -27,21 +27,7 @@
         </button>
     </div>
 
-    <div class="p-6">
-
-    <div class="p-6">
-        <div class="bg-gradient-to-br from-green-500 to-green-700 p-8 rounded-[32px] text-white shadow-xl shadow-green-100 relative overflow-hidden">
-            <p class="text-green-100 text-sm font-medium">Available Balance</p>
-           <h2 class="text-5xl font-black mt-2 tracking-tighter">₦<span id="balance">0.00</span></h2>
-            
-            <button onclick="window.location.href='withdraw.html'" class="mt-6 w-full bg-white text-green-700 font-extrabold py-4 rounded-2xl shadow-md transition active:scale-95">
-                Withdraw Funds 💰
-            </button>
-        </div>
-<button onclick="window.location.href='payouts.html'" class="w-full mt-4 bg-white border border-gray-200 text-gray-500 font-bold py-4 rounded-2xl flex justify-between items-center px-6 transition active:scale-95 shadow-sm">
-        <span class="text-[11px] uppercase tracking-widest">View Payout History</span>
-    </button>
-</div>
+  
   
     <div class="px-6 space-y-4">
         <h3 class="text-lg font-bold text-gray-900 ml-1">Tasks</h3>
@@ -55,7 +41,22 @@
         </div>
 
         <div class="btn-task p-5 flex justify-between items-center">
-            <div>
+            <div><div class="p-6">
+        <div class="bg-gradient-to-br from-green-500 to-green-700 p-8 rounded-[32px] text-white shadow-xl shadow-green-100 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+            
+            <p class="text-green-100 text-sm font-medium relative z-10">Available Balance</p>
+            <h2 class="text-5xl font-black mt-2 tracking-tighter relative z-10">₦<span id="balance">0.00</span></h2>
+            
+            <button onclick="window.location.href='withdraw.html'" class="mt-8 w-full bg-white text-green-700 font-extrabold py-4 rounded-2xl shadow-lg transition active:scale-95 flex justify-center items-center gap-2 relative z-10">
+                Withdraw Funds 💰
+            </button>
+        </div>
+
+        <button onclick="window.location.href='payouts.html'" class="w-full mt-4 bg-white border border-gray-100 text-gray-400 font-bold py-4 rounded-2xl flex justify-between items-center px-6 transition active:scale-95 shadow-sm">
+            <span class="text-[11px] uppercase tracking-widest">View Payout History ➔</span>
+        </button>
+    </div>
                 <p class="font-bold text-gray-900">YouTube Subscription</p>
                 <p class="text-xs text-gray-500">Reward: ₦100.00</p>
             </div>

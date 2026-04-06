@@ -31,28 +31,47 @@
         <p class="mt-8 text-center text-gray-600 font-medium">New member? <a href="signup.html" class="text-green-600 font-bold underline ml-1">Create Account</a></p>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAPjBdsaGPxgdrb4pTxyQwYbqJ4xJ_RCVQ",
-            authDomain: "nairataskhub-v2.firebaseapp.com",
-            projectId: "nairataskhub-v2",
-            storageBucket: "nairataskhub-v2.firebasestorage.app",
-            messagingSenderId: "817684965148",
-            appId: "1:817684965148:web:0e3439fd6072b955a77cd9"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
+        authDomain: "nairataskhub-v2.firebaseapp.com",
+        projectId: "nairataskhub-v2",
+        storageBucket: "nairataskhub-v2.firebasestorage.app",
+        messagingSenderId: "817684965148",
+        appId: "1:817684965148:web:0e3439fd6072b955a77cd9"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            signInWithEmailAndPassword(auth, email.value, password.value)
-                .then(() => { window.location.href = "dashboard.html"; })
-                .catch((error) => { alert("Error: " + error.message); });
-        });
-    </script>
+    const loginForm = document.getElementById('loginForm');
+    
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const btn = e.target.querySelector('button');
+
+        btn.innerText = "Logging in...";
+        btn.disabled = true;
+
+        // 🛡️ THIS PART KEEPS YOU LOGGED IN
+        setPersistence(auth, browserLocalPersistence)
+            .then(() => {
+                return signInWithEmailAndPassword(auth, email, password);
+            })
+            .then((userCredential) => {
+                window.location.href = "dashboard.html";
+            })
+            .catch((error) => {
+                alert("Login Failed: " + error.message);
+                btn.innerText = "Log In";
+                btn.disabled = false;
+            });
+    });
+</script>
 </body>
 </html>

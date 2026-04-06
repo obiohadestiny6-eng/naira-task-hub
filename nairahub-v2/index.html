@@ -31,11 +31,11 @@
         <p class="mt-8 text-center text-gray-600 font-medium">New member? <a href="signup.html" class="text-green-600 font-bold underline ml-1">Create Account</a></p>
     </div>
 
-   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-   const firebaseConfig = {
+<script>
+    const firebaseConfig = {
         apiKey: "AIzaSyAPJbdsaGPxgdrb4pTxyQwybqJ4xJ_RCVQ",
         authDomain: "nairataskhub-v2.firebaseapp.com",
         projectId: "nairataskhub-v2",
@@ -44,32 +44,23 @@
         appId: "1:817684965148:web:0e3439fd6072b955a77cd9"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    firebase.initializeApp(firebaseConfig);
 
-    const loginForm = document.getElementById('loginForm');
-    
-    loginForm.addEventListener('submit', (e) => {
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const btn = e.target.querySelector('button');
+        const pass = document.getElementById('password').value;
 
-        btn.innerText = "Logging in...";
-        btn.disabled = true;
-
-        // 🛡️ THIS PART KEEPS YOU LOGGED IN
-        setPersistence(auth, browserLocalPersistence)
+        // Force the browser to remember you
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .then(() => {
-                return signInWithEmailAndPassword(auth, email, password);
+                return firebase.auth().signInWithEmailAndPassword(email, pass);
             })
-            .then((userCredential) => {
+            .then(() => {
                 window.location.href = "dashboard.html";
             })
             .catch((error) => {
-                alert("Login Failed: " + error.message);
-                btn.innerText = "Log In";
-                btn.disabled = false;
+                alert("Error: " + error.message);
             });
     });
 </script>
